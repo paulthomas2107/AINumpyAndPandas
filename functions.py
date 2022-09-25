@@ -1,7 +1,9 @@
 import numpy as np
 import pandas as pd
 
+
 rg = np.random.default_rng()
+epoch_loss = []
 
 
 def generate_data(n_features, n_values):
@@ -35,3 +37,23 @@ def update_weights(weights, l_rate, target, prediction, feature):
 
 def update_bias(bias, l_rate, target, prediction):
     return bias + l_rate * (target - prediction)
+
+
+def train_model(data, weights, bias, l_rate, epochs):
+    for e in range(epochs):
+        individual_loss = []
+        for i in range(len(data)):
+            feature = data.loc[i][:-1]
+            target = data.loc[i][-1]
+            w_sum = get_weighted_sum(feature, weights, bias)
+            prediction = sigmoid(w_sum)
+            loss = cross_entropy(target, prediction)
+            individual_loss.append(loss)
+            # Gradient descent
+            weights = update_weights(weights, l_rate, target, prediction, feature)
+            bias = update_bias(bias, l_rate, target, prediction)
+            average_loss = sum(individual_loss) / len(individual_loss)
+            epoch_loss.append(average_loss)
+        # print("************************************************")
+        # print("Epoch ", str(e) + " : " + str(average_loss))
+    return epoch_loss
